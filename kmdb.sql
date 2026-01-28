@@ -95,13 +95,101 @@
 
 -- Drop existing tables, so you'll start fresh each time this script is run.
 -- TODO!
+-- Drops existing tables, so we start fresh with each
+-- run of this script
+DROP TABLE IF EXISTS movies;
+DROP TABLE IF EXISTS actors_by_movie;
+DROP TABLE IF EXISTS actors;
+DROP TABLE IF EXISTS agents;
+DROP TABLE IF EXISTS studios;
 
 -- Create new tables, according to your domain model
 -- TODO!
+CREATE TABLE movies (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  movie_title TEXT,
+  release_year INTEGER,
+  mpaa_rating TEXT,
+  studio_id INTEGER
+);
+
+CREATE TABLE actors_by_movie (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  character_name TEXT,
+  actor_id INTEGER,
+  movie_id INTEGER
+);
+
+CREATE TABLE actors (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  actor_name TEXT,
+  agent_id INTEGER
+);
+
+CREATE TABLE agents (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  agent_name TEXT
+);
+
+CREATE TABLE studios (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  studio_name TEXT
+);
 
 -- Insert data into your database that reflects the sample data shown above
 -- Use hard-coded foreign key IDs when necessary
 -- TODO!
+
+INSERT INTO studios (studio_name)
+VALUES
+  ('Warner Bros.');
+
+INSERT INTO movies (movie_title, release_year, mpaa_rating, studio_id)
+VALUES
+  ('Batman Begins', 2005, 'PG-13', 1),
+  ('The Dark Knight', 2008, 'PG-13', 1),
+  ('The Dark Knight Rises', 2012, 'PG-13', 1);
+
+INSERT INTO agents (agent_name)
+VALUES
+  ('Noah Phillips');
+
+INSERT INTO actors (agent_id, actor_name)
+VALUES
+  (1,'Christian Bale'),
+  (NULL,'Michael Caine'),
+  (NULL,'Liam Neeson'),
+  (NULL,'Katie Holmes'),
+  (NULL,'Gary Oldman'),
+  (NULL,'Heath Ledger'),
+  (NULL,'Aaron Eckhart'),
+  (NULL,'Maggie Gyllenhaal'),
+  (NULL,'Tom Hardy'),
+  (NULL,'Joseph Gordon-Levitt'),
+  (NULL,'Anne Hathaway');
+
+
+INSERT INTO actors_by_movie (actor_id, movie_id, character_name)
+VALUES
+  (1, 1, 'Bruce Wayne'),
+  (2, 1, 'Alfred'),
+  (3, 1, 'Ra''s Al Ghul'),
+  (4, 1, 'Rachel Dawes'),
+  (5, 1, 'Commissioner Gordon'),
+
+  (1, 2, 'Bruce Wayne'),
+  (6, 2, 'Joker'),
+  (7, 2, 'Harvey Dent'),
+  (2, 2, 'Alfred'),
+  (8, 2, 'Rachel Dawes'),
+
+  (1, 3, 'Bruce Wayne'),
+  (5, 3, 'Commissioner Gordon'),
+  (9, 3, 'Bane'),
+  (10, 3, 'John Blake'),
+  (11, 3, 'Selina Kyle');
+
+
 
 -- Prints a header for the movies output
 .print "Movies"
@@ -110,7 +198,10 @@
 
 -- ***TODO!***
 -- The SQL statement for the movies output goes here.
-
+SELECT movies.movie_title, movies.release_year, movies.mpaa_rating, studios.studio_name
+FROM movies
+INNER JOIN studios
+ON movies.studio_id = studios.id;
 -- Example output:
 -- Movies
 -- ======
@@ -126,7 +217,12 @@
 
 -- ***TODO!***
 -- The SQL statement for the cast output goes here.
-
+SELECT movies.movie_title, actors.actor_name, actors_by_movie.character_name
+FROM actors_by_movie
+INNER JOIN movies
+ON actors_by_movie.movie_id = movies.id
+INNER JOIN actors
+on actors_by_movie.actor_id = actors.id;
 -- Example output:
 -- Top Cast
 -- ========
@@ -154,7 +250,11 @@
 
 -- ***TODO!***
 -- The SQL statement for the represented actor(s) output goes here.
-
+SELECT actors.actor_name
+FROM actors
+INNER JOIN agents
+ON actors.agent_id = agents.id
+WHERE agents.agent_name = 'Noah Phillips';
 -- Example output:
 -- Represented by agent
 -- ====================
